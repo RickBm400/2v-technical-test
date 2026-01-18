@@ -1,5 +1,5 @@
-import { createBrowserRouter, Navigate } from 'react-router';
-import { Login } from '../pages';
+import { createBrowserRouter } from 'react-router';
+import { Debts, Login } from '../pages';
 
 const router = createBrowserRouter([
   {
@@ -7,9 +7,13 @@ const router = createBrowserRouter([
     Component: Login,
   },
   {
-    path: '*',
-    Component: () => <Navigate to='/login' replace />,
+    path: '/debts',
+    Component: Debts,
   },
+  // {
+  //   path: '*',
+  //   Component: () => <Navigate to='/login' replace />,
+  // },
 ]);
 
 export default router;

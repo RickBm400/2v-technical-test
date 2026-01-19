@@ -19,9 +19,8 @@ export default function Debts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [currentStatus, setCurrentStatus] = useState<debtStatus | 'ALL'>('ALL');
-  // const [debtList, setDebtsList] = useState<any | null>(null);
   const { openTimeline, setOpenModal, openModal } = useDebtListActionsContext();
-  const { data, isLoading, isError, refetch } = getDebtsPaginatedQuery({
+  const { data, isLoading, isError } = getDebtsPaginatedQuery({
     page: currentPage,
     limit: pageSize,
     ...(currentStatus != 'ALL' ? { status: currentStatus } : {}),
@@ -40,16 +39,9 @@ export default function Debts() {
     setPageSize(pageSize);
   };
 
-  const handleSelectChange = (value: string, ola: string) => {
-    console.log(value);
-    console.log(ola);
+  const handleSelectChange = (value: string) => {
     setCurrentStatus(value as debtStatus | 'ALL');
     setCurrentPage(1);
-    refetch({
-      page: 1,
-      limit: 10,
-      ...(value != 'ALL' ? { status: value } : {}),
-    } as any);
   };
 
   const debtsFilterOptions: Array<Record<string, string>> = [
@@ -74,7 +66,7 @@ export default function Debts() {
             style={{ width: 160 }}
             options={debtsFilterOptions}
             onClick={(e) => e.preventDefault()}
-            onChange={() => handleSelectChange}
+            onChange={handleSelectChange}
           ></Select>
           <Button
             color='primary'

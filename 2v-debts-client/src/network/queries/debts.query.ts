@@ -12,7 +12,7 @@ interface paginationParams {
 
 export const getDebtsPaginatedQuery = (params?: paginationParams) => {
   return useQuery({
-    queryKey: ['debts-paginated'],
+    queryKey: ['debts-paginated', params],
     queryFn: async () => {
       const response = await $axiosClient.get('/debt/paginated', {
         params,

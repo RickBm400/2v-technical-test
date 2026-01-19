@@ -8,18 +8,17 @@ export default function Login() {
   const navigate = useNavigate();
 
   const onFinish = (payload: { email: string; password: string }) => {
-    try {
-      mutateLogin(payload, {
-        onSuccess: () => {
-          navigate('/debts', { replace: true });
-        },
-      });
-    } catch (error) {
-      console.log(error);
-      message.error(
-        'Error al iniciar sesión. Por favor, verifica tus credenciales.',
-      );
-    }
+    mutateLogin(payload, {
+      onSuccess: () => {
+        navigate('/debts', { replace: true });
+      },
+      onError: (error) => {
+        console.log(error);
+        message.error(
+          'Error al iniciar sesión. Por favor, verifica tus credenciales.',
+        );
+      },
+    });
   };
 
   return (

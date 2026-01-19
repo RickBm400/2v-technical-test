@@ -16,20 +16,19 @@ export default function Register() {
     name: string;
     password: string;
   }) => {
-    try {
-      mutateRegister(
-        { email, password, name },
-        {
-          onSuccess: () => {
-            message.success('Registro exitoso!');
-            navigate('/debts', { replace: true });
-          },
+    mutateRegister(
+      { email, password, name },
+      {
+        onSuccess: () => {
+          message.success('Registro exitoso!');
+          navigate('/debts', { replace: true });
         },
-      );
-    } catch (error) {
-      console.log(error);
-      message.error('Error al registrarse. Por favor, intenta de nuevo.');
-    }
+        onError: (error) => {
+          console.log(error);
+          message.error('Error al registrarse. Por favor, intenta de nuevo.');
+        },
+      },
+    );
   };
 
   return (

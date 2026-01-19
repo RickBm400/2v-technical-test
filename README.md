@@ -22,6 +22,9 @@ npm run install:all
 # Start both frontend and backend
 npm start
 
+# Init prisma database migrations and generate
+npm run db:init
+
 # Or run separately
 npm run dev:frontend  # Port 5173
 npm run dev:backend   # Port 3000

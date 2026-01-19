@@ -7,7 +7,8 @@
     "install:all": "npm install && cd 2v-debts-client && npm install && cd ../2v-debts-server && npm install",
     "start": "concurrently --kill-others \"npm run dev:frontend\" \"npm run dev:backend\"",
     "dev:frontend": "cd 2v-debts-client && npm run dev",
-    "dev:backend": "cd 2v-debts-server && npm run debug"
+    "dev:backend": "cd 2v-debts-server && npm run debug",
+    "db:init": "cd 2v-debts-server && npm run prisma:migrate && npm run prisma:generate"
   },
   "author": "",
   "license": "ISC",

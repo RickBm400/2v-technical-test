@@ -1,4 +1,5 @@
-import { useListActionsContext } from '@/context/ListActions.context';
+import { useDebtListActionsContext } from '@/context/ListActions.context';
+import { deleteDebtMutation } from '@/network/queries/debts.query';
 import { Dropdown, type MenuProps } from 'antd';
 import type React from 'react';
 
@@ -7,11 +8,18 @@ export default function DropdownAction(props: {
   data: any;
 }) {
   const { setOpenTimeline, openTimeline, setDebtData } =
-    useListActionsContext();
+    useDebtListActionsContext();
+  const { mutate: deleteMutation } = deleteDebtMutation();
 
   const items: MenuProps['items'] = [
     { label: 'Editar deuda', key: 'edit' },
-    { label: 'Eliminar deuda', key: 'delete' },
+    {
+      label: 'Eliminar deuda',
+      key: 'delete',
+      onClick: () => {
+        deleteMutation(props.data.id);
+      },
+    },
     { label: 'Pagar deuda', key: 'payment' },
     {
       label: 'Movimientos',

@@ -8,28 +8,24 @@ import { Input, Select, Button } from 'antd';
 
 // Debts components
 import ListDebts from './components/ListDebts';
-import { useListActionsContext } from '@/context/ListActions.context';
+import { useDebtListActionsContext } from '@/context/ListActions.context';
 import DebtInfoCard from './components/DebtInfoCard';
 import { getDebtsPaginatedQuery } from '@/network/queries/debts.query';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Navigate } from 'react-router';
+import type { debtStatus } from '@/types/debts.types';
 
 export default function Debts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [debtList, setDebtsList] = useState<any | null>(null);
-  const { openTimeline, setOpenModal, openModal } = useListActionsContext();
-  const { data, isLoading, isError } = getDebtsPaginatedQuery({
+  const [currentStatus, setCurrentStatus] = useState<debtStatus | 'ALL'>('ALL');
+  // const [debtList, setDebtsList] = useState<any | null>(null);
+  const { openTimeline, setOpenModal, openModal } = useDebtListActionsContext();
+  const { data, isLoading, isError, refetch } = getDebtsPaginatedQuery({
     page: currentPage,
+    limit: pageSize,
+    ...(currentStatus != 'ALL' ? { status: currentStatus } : {}),
   } as any);
-
-  useEffect(() => {
-    if (data) {
-      console.log(data.data);
-      const debts = data.data;
-      setDebtsList(debts);
-    }
-  }, [data]);
 
   if (isLoading) {
     return <p>Loading character </p>;
@@ -44,6 +40,24 @@ export default function Debts() {
     setPageSize(pageSize);
   };
 
+  const handleSelectChange = (value: string, ola: string) => {
+    console.log(value);
+    console.log(ola);
+    setCurrentStatus(value as debtStatus | 'ALL');
+    setCurrentPage(1);
+    refetch({
+      page: 1,
+      limit: 10,
+      ...(value != 'ALL' ? { status: value } : {}),
+    } as any);
+  };
+
+  const debtsFilterOptions: Array<Record<string, string>> = [
+    { value: 'ALL', label: 'Todas' },
+    { value: 'PENDING', label: 'Pendientes' },
+    { value: 'COMPLETED', label: 'Pagadas' },
+  ];
+
   return (
     <div className='h-screen w-screen p-8 grid grid-cols-12 gap-8 justify-center'>
       <div
@@ -56,13 +70,11 @@ export default function Debts() {
             suffix={<Icon path={mdiSearchWeb} size={1}></Icon>}
           />
           <Select
-            defaultValue={'ALL'}
+            value={currentStatus}
             style={{ width: 160 }}
-            options={[
-              { value: 'ALL', label: 'Todas' },
-              { value: 'PENDING', label: 'Pendientes' },
-              { value: 'COMPLETED', label: 'Pagadas' },
-            ]}
+            options={debtsFilterOptions}
+            onClick={(e) => e.preventDefault()}
+            onChange={() => handleSelectChange}
           ></Select>
           <Button
             color='primary'
@@ -74,7 +86,7 @@ export default function Debts() {
         </div>
         <div id='debts_list'>
           <ListDebts
-            debtsData={debtList}
+            debtsData={data.data}
             currentPage={currentPage}
             pageSize={pageSize}
             handlePaginationChange={handlePaginationChange}

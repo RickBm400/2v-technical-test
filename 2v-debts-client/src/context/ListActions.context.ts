@@ -17,4 +17,4 @@ export const ActionsContext = createContext<{
   setDebtData: () => {},
 });
 
-export const useListActionsContext = () => useContext(ActionsContext);
+export const useDebtListActionsContext = () => useContext(ActionsContext);

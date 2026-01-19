@@ -1,9 +1,10 @@
-import { useListActionsContext } from '@/context/ListActions.context';
+import { useDebtListActionsContext } from '@/context/ListActions.context';
 import { Button, Card } from 'antd';
 import StatusTag from './StatusTag';
 
 export default function DebtInfoCard() {
-  const { debtData, setOpenTimeline, setDebtData } = useListActionsContext();
+  const { debtData, setOpenTimeline, setDebtData } =
+    useDebtListActionsContext();
   return (
     <div className='space-y-4'>
       <Card>

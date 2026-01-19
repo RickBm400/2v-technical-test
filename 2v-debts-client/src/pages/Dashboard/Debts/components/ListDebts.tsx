@@ -56,78 +56,11 @@ export default function ListDebts(props: componentProps) {
     },
   ];
 
-  // const dataSource: debtsListDataType[] = [
-  //   {
-  //     title: 'Deuda1',
-  //     description: 'Pago por la cena del viernes',
-  //     total_debt: 100,
-  //     status: 'PENDING',
-  //   },
-  //   {
-  //     title: 'Deuda2',
-  //     description: 'Pago por el café del lunes',
-  //     total_debt: 200,
-  //     status: 'COMPLETED',
-  //   },
-  //   {
-  //     title: 'Deuda3',
-  //     description: 'Pago por el café del martes',
-  //     total_debt: 300,
-  //     status: 'PENDING',
-  //   },
-  //   {
-  //     title: 'Deuda3',
-  //     description: 'Pago por el café del martes',
-  //     total_debt: 300,
-  //     status: 'PENDING',
-  //   },
-  //   {
-  //     title: 'Deuda3',
-  //     description: 'Pago por el café del martes',
-  //     total_debt: 300,
-  //     status: 'PENDING',
-  //   },
-  //   {
-  //     title: 'Deuda3',
-  //     description: 'Pago por el café del martes',
-  //     total_debt: 300,
-  //     status: 'PENDING',
-  //   },
-  //   {
-  //     title: 'Deuda3',
-  //     description: 'Pago por el café del martes',
-  //     total_debt: 300,
-  //     status: 'PENDING',
-  //   },
-  //   {
-  //     title: 'Deuda3',
-  //     description: 'Pago por el café del martes',
-  //     total_debt: 300,
-  //     status: 'PENDING',
-  //   },
-  //   {
-  //     title: 'Deuda3',
-  //     description: 'Pago por el café del martes',
-  //     total_debt: 300,
-  //     status: 'PENDING',
-  //   },
-  //   {
-  //     title: 'Deuda3',
-  //     description: 'Pago por el café del martes',
-  //     total_debt: 300,
-  //     status: 'PENDING',
-  //   },
-  // ].map((debt, index) => {
-  //   return {
-  //     ...debt,
-  //     key: index,
-  //   };
-  // });
-
-  const tableData = props.debtsData?.data.map((debt, index) => ({
-    ...debt,
-    key: index,
-  }));
+  const tableData =
+    props.debtsData?.data.map((debt, index) => ({
+      ...debt,
+      key: index,
+    })) || [];
 
   return (
     <Table<debtsListDataType>

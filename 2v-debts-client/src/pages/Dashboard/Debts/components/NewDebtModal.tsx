@@ -1,4 +1,9 @@
-import { Modal, Form, DatePicker, Input, InputNumber } from 'antd';
+import { addDebtMutation } from '@/network/queries/debts.query';
+import { getUsersQuery } from '@/network/queries/user.query';
+import type { User } from '@/types/users.types';
+import { Modal, Form, DatePicker, Input, InputNumber, Select } from 'antd';
+import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router';
 
 interface componentProps {
   open: boolean;
@@ -7,11 +12,29 @@ interface componentProps {
 
 export default function NewDebtModal(props: componentProps) {
   const [form] = Form.useForm();
+  const [usersList, setUsersList] = useState<User[]>([]);
+  const { mutate: debtMutation } = addDebtMutation();
+  const { data: usersRetrievedData, isLoading, isError } = getUsersQuery();
+
+  useEffect(() => {
+    if (usersRetrievedData) {
+      const data = usersRetrievedData.data;
+      setUsersList(data);
+    }
+  }, [usersRetrievedData]);
+
+  if (isLoading) {
+    return <p>Loading character </p>;
+  }
+
+  if (isError) {
+    return <Navigate to={'/login'} />;
+  }
 
   const submitDebt = async () => {
-    const values = await form.validateFields();
-    console.log('Received values:', values);
-    // Implement the logic to submit the debt here
+    const debtDataPayload = await form.validateFields();
+    debtMutation(debtDataPayload);
+    console.log('Received values:', debtDataPayload);
     props.onClose();
   };
 
@@ -56,8 +79,20 @@ export default function NewDebtModal(props: componentProps) {
         <Input placeholder='Descripción'></Input>
       </Form.Item>
       <Form.Item
+        name='debtorId'
+        rules={[{ required: true, message: 'Debes elegir un deudor' }]}
+      >
+        <Select
+          options={usersList.map((user) => ({
+            value: user.id,
+            label: user.name,
+          }))}
+          placeholder='Elegir deudor'
+        />
+      </Form.Item>
+      <Form.Item
         className='w-full'
-        name='debt_total'
+        name='total_debt'
         rules={[
           { required: true, message: 'Debes asignar un total a tu deuda' },
         ]}

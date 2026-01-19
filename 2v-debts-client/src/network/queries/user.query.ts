@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import $axiosClient from '../axios.client';
 
 interface RegisterPayload {
@@ -43,6 +43,16 @@ export const registerUserMutation = (onSuccess?: () => void) => {
     },
     onError: (error) => {
       console.log(error);
+    },
+  });
+};
+
+export const getUsersQuery = () => {
+  return useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      const response = await $axiosClient.get('/user');
+      return response.data;
     },
   });
 };

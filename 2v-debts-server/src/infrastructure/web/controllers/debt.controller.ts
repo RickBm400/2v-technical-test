@@ -2,7 +2,8 @@ import { Router } from 'express';
 import asyncHandler from '../middlewares/async-handler.middleware';
 import {
   CreateDebtUseCase,
-  DeleteDebtUSeCase,
+  DeleteDebtUseCase,
+  ListDebtPaginatedUseCase,
   UpdateDebtUseCase,
 } from '../../../application/debt.use-case';
 
@@ -18,7 +19,28 @@ router.get(
 
 // get debts info by id
 // pupulate movements sorted
-// router.get('/:id');
+router.get(
+  '/:userId/paginated',
+  asyncHandler(async (req, res) => {
+    const userId = req.params.userId as string;
+    const { status, search, limit, page } = req.query as any;
+
+    const debtPaginatedUseCase = new ListDebtPaginatedUseCase();
+    const result = await debtPaginatedUseCase.execute(
+      userId,
+      {
+        status,
+        search,
+      },
+      { limit, page },
+    );
+
+    res.status(200).json({
+      message: 'Debts retrieved successfully',
+      data: result,
+    });
+  }),
+);
 
 // export debts data to csv
 // router.get('/:id/export');
@@ -68,7 +90,7 @@ router.delete(
   asyncHandler(async (req, res) => {
     const debtId = req.params.id as string;
 
-    const deleteDebt = new DeleteDebtUSeCase();
+    const deleteDebt = new DeleteDebtUseCase();
     await deleteDebt.execute(debtId);
 
     res.status(200).json({

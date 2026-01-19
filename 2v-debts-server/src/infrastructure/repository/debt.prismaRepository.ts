@@ -1,20 +1,49 @@
 import {
   DebtStatus,
-  type Debt,
   type Prisma,
 } from '../../../prisma/generated/prisma/client';
 import type { debtStatus } from '../../domain/entities/debt.entity';
 import { prisma } from '../database/prisma';
 
 export class PrismaDebtRepository {
-  findByUserId(user_id: string) {
-    return prisma.debt.findMany({
-      where: { OR: [{ debtorId: user_id }, { creditorId: user_id }] },
-    });
+  async findByUserId(
+    user_id: string,
+    options?: { status: debtStatus | any; search: string },
+    constraints?: { limit: number; page: number },
+  ) {
+    const page = Number(constraints?.page) || 1;
+    const limit = Math.min(Number(constraints?.limit) || 10, 50);
+    const skip = (page - 1) * limit;
+
+    const where = {
+      OR: [{ debtorId: user_id }, { creditorId: user_id }],
+      ...(options?.status && { status: options.status }),
+      ...(options?.search && {
+        title: { contains: options.search, mode: 'insensitive' },
+      }),
+    };
+
+    const [debts, count] = await Promise.all([
+      prisma.debt.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+
+      prisma.debt.count({ where }),
+    ]);
+
+    return {
+      total: count,
+      page,
+      limit,
+      totalPages: Math.ceil(count / limit),
+      data: debts,
+    };
   }
 
   findById(id: string, options?: { status: debtStatus | any }) {
-    console.log({ where: { id, ...options } });
     return prisma.debt.findFirst({ where: { id, ...options } });
   }
 

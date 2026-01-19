@@ -26,7 +26,7 @@ export class UpdateDebtUseCase implements UseCase {
   }
 }
 
-export class DeleteDebtUSeCase implements UseCase {
+export class DeleteDebtUseCase implements UseCase {
   constructor(
     private debtRepository: PrismaDebtRepository = new PrismaDebtRepository(),
   ) {}
@@ -39,5 +39,19 @@ export class DeleteDebtUSeCase implements UseCase {
 
     await this.debtRepository.delete(id);
     return id;
+  }
+}
+
+export class ListDebtPaginatedUseCase implements UseCase {
+  constructor(
+    private debtRepository: PrismaDebtRepository = new PrismaDebtRepository(),
+  ) {}
+
+  execute(
+    userId: string,
+    options?: { status: debtStatus | any; search: string },
+    constraints?: { limit: number; page: number },
+  ) {
+    return this.debtRepository.findByUserId(userId, options, constraints);
   }
 }

@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  debts       Debt[]
+  friendships Friendship[] @relation("UserFriendships")
+  friends     Friendship[] @relation("UserFriends")
+  movements   Movement[]
+
+  @@map("users")
+}
+
+model Debt {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  total_debt      Float
+  total_paid      Float
+  status      String   @default("PENDING")
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+
+  user_id    String
+  user      User     @relation(fields: [user_id], references: [id])
+  movements Movement[]
+
+  @@map("debts")
+}
+
+model Friendship {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user_id   String
+  user1     User     @relation("UserFriendships", fields: [user_id], references: [id])
+  friend_id   String
+  user2     User     @relation("UserFriends", fields: [friend_id], references: [id])
+
+  @@unique([user_id, friend_id])
+  @@map("friendships")
+}
+
+model Movement {
+  id              String   @id @default(uuid())
+  type            String   @default("CREATION")
+  amount          Float
+  previous_amount  Float
+  new_amount       Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+
+  user_id String
+  user   User   @relation(fields: [user_id], references: [id])
+  debt_id String
+  debt   Debt   @relation(fields: [debt_id], references: [id])
+
+  @@map("movements")
+}

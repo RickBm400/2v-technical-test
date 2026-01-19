@@ -1,4 +1,4 @@
-# 2V Debts - Technical Test
+# 2V - Technical Test
 
 A full-stack web application for managing debts between users. Built with modern technologies for a scalable and maintainable codebase.
 

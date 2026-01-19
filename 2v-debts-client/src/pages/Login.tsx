@@ -1,10 +1,25 @@
-import { Form, Input, Button, Checkbox, Card, message } from 'antd';
+import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { loginUserQuery } from '@/network/queries/user.query';
+import { useNavigate } from 'react-router';
 
 export default function Login() {
-  const onFinish = (values: any) => {
-    console.log('Received values:', values);
-    message.success('Login exitoso!');
+  const { mutate: mutateLogin } = loginUserQuery();
+  const navigate = useNavigate();
+
+  const onFinish = (payload: { email: string; password: string }) => {
+    try {
+      mutateLogin(payload, {
+        onSuccess: () => {
+          navigate('/debts', { replace: true });
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      message.error(
+        'Error al iniciar sesión. Por favor, verifica tus credenciales.',
+      );
+    }
   };
 
   return (
@@ -41,14 +56,14 @@ export default function Login() {
             />
           </Form.Item>
 
-          <Form.Item>
+          {/* <Form.Item>
             <Form.Item name='remember' valuePropName='checked' noStyle>
               <Checkbox>Recordarme</Checkbox>
             </Form.Item>
             <a className='float-right' href='/forgot-password'>
               ¿Olvidaste tu contraseña?
             </a>
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item>
             <Button
@@ -61,7 +76,7 @@ export default function Login() {
           </Form.Item>
 
           <div className='text-center'>
-            <a href='/register'>¿No tienes cuenta? Regístrate</a>
+            <a href='/sign-up'>¿No tienes cuenta? Regístrate</a>
           </div>
         </Form>
       </Card>

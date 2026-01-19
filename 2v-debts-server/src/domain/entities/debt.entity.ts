@@ -1,6 +1,7 @@
 export enum debtStatus {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
+  DELETED = 'DELETED',
 }
 
 export interface Debt {

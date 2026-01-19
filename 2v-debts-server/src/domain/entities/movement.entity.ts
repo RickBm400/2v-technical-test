@@ -1,7 +1,7 @@
 export enum MovementType {
   CREATION = 'CREATION',
   PAYMENT = 'PAYMENT',
-  CANCELLATTION = 'CANCELLATION',
+  CANCELLATION = 'CANCELLATION',
 }
 
 export interface Movement {

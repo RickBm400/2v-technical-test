@@ -33,22 +33,28 @@ model User {
   @@map("users")
 }
 
+enum DebtStatus {
+  PENDING
+  COMPLETED
+  DELETED
+}
+
 model Debt {
   id          String    @id @default(uuid())
   title       String
   description String
   total_debt  Float
   total_paid  Float     @default(0)
-  status      String    @default("PENDING")
+  status      DebtStatus  @default(PENDING)
   dueDate     DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
-  creditor_id String
-  user1       User       @relation("UserCreditor", fields: [creditor_id], references: [id])
-  debtor_id   String
-  user2       User       @relation("UserDebtor", fields: [debtor_id], references: [id])
+  creditorId  String
+  creditor_id User       @relation("UserCreditor", fields: [creditorId], references: [id])
+  debtorId    String
+  debtor_id   User       @relation("UserDebtor", fields: [debtorId], references: [id])
   movements   Movement[]
 
   users User[]
@@ -61,18 +67,24 @@ model Friendship {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user_id   String
-  user1     User   @relation("UserFriendships", fields: [user_id], references: [id])
-  friend_id String
-  user2     User   @relation("UserFriends", fields: [friend_id], references: [id])
+  userId    String
+  user_id   User   @relation("UserFriendships", fields: [userId], references: [id])
+  friendId  String
+  friend_id User   @relation("UserFriends", fields: [friendId], references: [id])
 
-  @@unique([user_id, friend_id])
+  @@unique([userId, friendId])
   @@map("friendships")
+}
+
+enum MovementType {
+  CREATION
+  PAYMENT
+  CANCELLATION
 }
 
 model Movement {
   id              String    @id @default(uuid())
-  type            String    @default("CREATION")
+  type            MovementType    @default(CREATION)
   amount          Float
   previous_amount Float
   new_amount      Float

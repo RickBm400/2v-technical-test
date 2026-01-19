@@ -11,4 +11,13 @@ export class JwtService {
   verify(token: string) {
     return jwt.verify(token, process.env.JWT_SECRET!);
   }
+
+  validateTokenExpiration(token: string): boolean {
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+      return decoded.exp ? decoded.exp * 1000 > Date.now() : false;
+    } catch {
+      return false;
+    }
+  }
 }

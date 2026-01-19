@@ -34,4 +34,5 @@ router.get('/login', async (req, res) => {
     res.status(500).json({ message });
   }
 });
+
 export default router;

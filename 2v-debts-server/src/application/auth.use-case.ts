@@ -2,8 +2,9 @@ import type { User } from '../domain/entities/user.entity';
 import { PrismaUserRepository } from '../infrastructure/repository/user.prismaRepository';
 import { BcryptPasswordHasher } from '../infrastructure/security/BcryptService';
 import { JwtService } from '../infrastructure/security/JwtService';
+import type { UseCase } from '../shared/use-cases.types';
 
-export class RegisterUseCase {
+export class RegisterUseCase implements UseCase {
   constructor(
     private userRepository: PrismaUserRepository = new PrismaUserRepository(),
     private passwordHasher: BcryptPasswordHasher = new BcryptPasswordHasher(),
@@ -22,7 +23,7 @@ export class RegisterUseCase {
   }
 }
 
-export class LoginUseCase {
+export class LoginUseCase implements UseCase {
   constructor(
     private userRepository: PrismaUserRepository = new PrismaUserRepository(),
     private passwordHasher: BcryptPasswordHasher = new BcryptPasswordHasher(),

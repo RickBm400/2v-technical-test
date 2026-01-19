@@ -80,4 +80,58 @@ describe('errorHandler middleware', () => {
       message: 'bad request',
     });
   });
+
+  // New tests appended
+  it('should default to 500 and "Internal server error" when non-Error and non-string is passed', () => {
+    const res = makeRes();
+    errorHandler({ any: 'object' } as any, req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.status(500).json).toHaveBeenCalledWith({ message: 'Internal server error' });
+  });
+
+  it('should fallback to 500 when statusCode exists but is not a number', () => {
+    const res = makeRes();
+    const err: any = new Error('weird');
+    err.statusCode = 'NaN';
+
+    errorHandler(err as any, req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.status(500).json).toHaveBeenCalledWith({ message: 'weird' });
+  });
+
+  it('should serialize plain object messages to JSON objects', () => {
+    const res = makeRes();
+    const err = new Error() as any;
+    err.message = { reason: 'invalid', field: 'email' };
+
+    errorHandler(err as any, req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.status(500).json).toHaveBeenCalledWith({ message: { reason: 'invalid', field: 'email' } });
+  });
+
+  it('should handle Error with undefined message as empty string', () => {
+    const res = makeRes();
+    const err = new Error('anything');
+    (err as any).message = undefined;
+
+    errorHandler(err as any, req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(500);
+    expect(res.status(500).json).toHaveBeenCalledWith({ message: '' });
+  });
+
+  it('should call next when headers already sent', () => {
+    const json = jest.fn();
+    const status = jest.fn(() => ({ json }));
+    const res = { status, json, headersSent: true } as unknown as Response & { headersSent: boolean };
+
+    errorHandler(new Error('late error'), req, res, next);
+
+    expect(next).toHaveBeenCalled();
+    expect(status).not.toHaveBeenCalled();
+    expect(json).not.toHaveBeenCalled();
+  });
 });

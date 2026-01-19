@@ -32,7 +32,7 @@ export class DeleteDebtUseCase implements UseCase {
   ) {}
 
   async execute(id: string) {
-    const debtExits = await this.debtRepository.findById(id, {
+    const debtExits = await this.debtRepository.findOneById(id, {
       status: { not: debtStatus.DELETED },
     });
     if (!debtExits) throw new CustomError("Regist doesn\'t exist", 404);
@@ -52,6 +52,10 @@ export class ListDebtPaginatedUseCase implements UseCase {
     options?: { status: debtStatus | any; search: string },
     constraints?: { limit: number; page: number },
   ) {
-    return this.debtRepository.findByUserId(userId, options, constraints);
+    return this.debtRepository.findByUserIdPaginated(
+      userId,
+      options,
+      constraints,
+    );
   }
 }

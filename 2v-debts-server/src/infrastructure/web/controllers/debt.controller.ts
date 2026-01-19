@@ -6,6 +6,8 @@ import {
   ListDebtPaginatedUseCase,
   UpdateDebtUseCase,
 } from '../../../application/debt.use-case';
+import { CustomError } from '../middlewares/error-handler.middleware';
+import { authMiddleware } from '../middlewares/jwt-header.middleware';
 
 const router = Router();
 
@@ -20,9 +22,12 @@ router.get(
 // get debts info by id
 // pupulate movements sorted
 router.get(
-  '/:userId/paginated',
+  '/paginated',
+  authMiddleware,
   asyncHandler(async (req, res) => {
-    const userId = req.params.userId as string;
+    const userId = req.user?.userId || null;
+    if (!userId) throw new CustomError('Forbidden access', 403);
+
     const { status, search, limit, page } = req.query as any;
 
     const debtPaginatedUseCase = new ListDebtPaginatedUseCase();
@@ -51,11 +56,17 @@ router.get(
 // set new debt
 router.post(
   '/',
+  authMiddleware,
   asyncHandler(async (req, res) => {
+    const userId = req.user?.userId || null;
+    if (!userId) throw new CustomError('Forbidden access', 403);
     const debt = req.body;
     const createDebt = new CreateDebtUseCase();
 
-    const newDebt = await createDebt.execute(debt);
+    const newDebt = await createDebt.execute({
+      creditorId: userId,
+      ...debt,
+    });
 
     res.status(200).json({
       message: 'Debt created successfully',

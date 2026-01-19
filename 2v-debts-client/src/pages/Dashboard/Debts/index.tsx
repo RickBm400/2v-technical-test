@@ -11,18 +11,21 @@ import ListDebts from './components/ListDebts';
 import { useDebtListActionsContext } from '@/context/ListActions.context';
 import DebtInfoCard from './components/DebtInfoCard';
 import { getDebtsPaginatedQuery } from '@/network/queries/debts.query';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Navigate } from 'react-router';
 import type { debtStatus } from '@/types/debts.types';
 
 export default function Debts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [searchName, setSearchName] = useState<string | null>(null);
   const [currentStatus, setCurrentStatus] = useState<debtStatus | 'ALL'>('ALL');
   const { openTimeline, setOpenModal, openModal } = useDebtListActionsContext();
+  const searchTimeoutRef = useRef<number | undefined>(undefined);
   const { data, isLoading, isError } = getDebtsPaginatedQuery({
     page: currentPage,
     limit: pageSize,
+    search: searchName,
     ...(currentStatus != 'ALL' ? { status: currentStatus } : {}),
   } as any);
 
@@ -44,6 +47,19 @@ export default function Debts() {
     setCurrentPage(1);
   };
 
+  const handleSearchName = (value: string) => {
+    setSearchName(value);
+    setCurrentPage(1);
+
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      // Trigger search after 2 seconds
+    }, 2000);
+  };
+
   const debtsFilterOptions: Array<Record<string, string>> = [
     { value: 'ALL', label: 'Todas' },
     { value: 'PENDING', label: 'Pendientes' },
@@ -59,6 +75,9 @@ export default function Debts() {
         <div className='flex gap-2'>
           <Input
             placeholder='Buscar deuda'
+            onPressEnter={(e) =>
+              handleSearchName((e.target as HTMLInputElement).value)
+            }
             suffix={<Icon path={mdiSearchWeb} size={1}></Icon>}
           />
           <Select

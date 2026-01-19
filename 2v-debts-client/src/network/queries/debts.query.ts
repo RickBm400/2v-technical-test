@@ -6,7 +6,7 @@ import { queryClient } from './client';
 interface paginationParams {
   page: number;
   limit: number;
-  name?: string;
+  search?: string;
   status?: debtStatus | string;
 }
 

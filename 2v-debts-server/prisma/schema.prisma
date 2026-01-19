@@ -5,9 +5,9 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider   = "prisma-client-js"
-  output     = "generated/prisma/client"
-  url       = env("DATABASE_URL")
+  provider = "prisma-client-js"
+  output   = "generated/prisma/client"
+  url      = env("DATABASE_URL")
 }
 
 datasource db {
@@ -27,6 +27,8 @@ model User {
   friendships Friendship[] @relation("UserFriendships")
   friends     Friendship[] @relation("UserFriends")
   movements   Movement[]
+  creditor    Debt[]       @relation("UserCreditor")
+  debtor      Debt[]       @relation("UserDebtor")
 
   @@map("users")
 }
@@ -36,16 +38,20 @@ model Debt {
   title       String
   description String
   total_debt  Float
-  total_paid  Float
+  total_paid  Float     @default(0)
   status      String    @default("PENDING")
   dueDate     DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
-  user_id   String
-  user      User       @relation(fields: [user_id], references: [id])
-  movements Movement[]
+  creditor_id String
+  user1       User       @relation("UserCreditor", fields: [creditor_id], references: [id])
+  debtor_id   String
+  user2       User       @relation("UserDebtor", fields: [debtor_id], references: [id])
+  movements   Movement[]
+
+  users User[]
 
   @@map("debts")
 }

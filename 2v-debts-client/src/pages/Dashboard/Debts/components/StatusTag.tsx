@@ -11,17 +11,24 @@ export default function StatusTag(props: { status: string }) {
   const colors: Record<debtStatus, colorProps> = {
     PENDING: {
       title: 'Pendiente',
-      color: 'red',
+      color: 'orange',
     },
     COMPLETED: {
       title: 'Completado',
       color: 'green',
     },
+    DELETED: {
+      title: 'Eliminada',
+      color: 'red',
+    },
   };
 
+  const statusSelected =
+    colors[(props?.status ?? debtStatus.PENDING) as debtStatus];
+
   return (
-    <Tag variant='outlined' color={colors[props.status as debtStatus].color}>
-      {colors[props.status as debtStatus].title}
+    <Tag variant='outlined' color={statusSelected.color}>
+      {statusSelected.title}
     </Tag>
   );
 }

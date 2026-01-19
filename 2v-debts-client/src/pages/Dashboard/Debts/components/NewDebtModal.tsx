@@ -23,6 +23,8 @@ export default function NewDebtModal(props: componentProps) {
       onCancel={props.onClose}
       onOk={submitDebt}
       destroyOnHidden={true}
+      okText='Crear deuda'
+      cancelText='Cancelar'
       modalRender={(dom) => (
         <Form
           form={form}
@@ -60,10 +62,17 @@ export default function NewDebtModal(props: componentProps) {
           { required: true, message: 'Debes asignar un total a tu deuda' },
         ]}
       >
-        <InputNumber<number> min={0} style={{ width: '100%' }}></InputNumber>
+        <InputNumber<number>
+          min={0}
+          style={{ width: '100%' }}
+          placeholder='monto'
+        ></InputNumber>
       </Form.Item>
       <Form.Item name='due_date' rules={[{ required: false }]}>
-        <DatePicker style={{ width: '100%' }}></DatePicker>
+        <DatePicker
+          style={{ width: '100%' }}
+          placeholder='fecha de vencimiento'
+        ></DatePicker>
       </Form.Item>
     </Modal>
   );

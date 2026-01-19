@@ -5,21 +5,51 @@ import NewDebtModal from './components/NewDebtModal';
 
 // antd components
 import { Input, Select, Button } from 'antd';
-import { useState } from 'react';
 
 // Debts components
 import ListDebts from './components/ListDebts';
+import { useListActionsContext } from '@/context/ListActions.context';
+import DebtInfoCard from './components/DebtInfoCard';
+import { getDebtsPaginatedQuery } from '@/network/queries/debts.query';
+import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router';
 
 export default function Debts() {
-  const [openTimeline, setOpenTimeline] = useState<boolean>(false);
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [debtList, setDebtsList] = useState<any | null>(null);
+  const { openTimeline, setOpenModal, openModal } = useListActionsContext();
+  const { data, isLoading, isError } = getDebtsPaginatedQuery({
+    page: currentPage,
+  } as any);
+
+  useEffect(() => {
+    if (data) {
+      console.log(data.data);
+      const debts = data.data;
+      setDebtsList(debts);
+    }
+  }, [data]);
+
+  if (isLoading) {
+    return <p>Loading character </p>;
+  }
+
+  if (isError) {
+    return <Navigate to={'/login'} />;
+  }
+
+  const handlePaginationChange = (page: number, pageSize: number) => {
+    setCurrentPage(page);
+    setPageSize(pageSize);
+  };
 
   return (
     <div className='h-screen w-screen p-8 grid grid-cols-12 gap-8 justify-center'>
       <div
         className={` space-y-8 ${openTimeline ? `col-span-8` : 'col-span-12'}`}
       >
-        <h4>Deudas pendientes</h4>
+        <h4 className='text-[2rem] font-bold'>Deudas pendientes</h4>
         <div className='flex gap-2'>
           <Input
             placeholder='Buscar deuda'
@@ -44,13 +74,16 @@ export default function Debts() {
         </div>
         <div id='debts_list'>
           <ListDebts
-            timelineAction={() => setOpenTimeline(!openTimeline)}
+            debtsData={debtList}
+            currentPage={currentPage}
+            pageSize={pageSize}
+            handlePaginationChange={handlePaginationChange}
           ></ListDebts>
         </div>
       </div>
-      <div
-        className={`bg-blue-300 col-span-4 ${openTimeline ? 'block' : 'hidden'}`}
-      ></div>
+      <div className={` col-span-4 ${openTimeline ? 'block' : 'hidden'}`}>
+        <DebtInfoCard />
+      </div>
       <NewDebtModal open={openModal} onClose={() => setOpenModal(false)} />
     </div>
   );

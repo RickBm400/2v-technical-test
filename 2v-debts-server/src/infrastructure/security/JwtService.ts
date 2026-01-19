@@ -1,13 +1,14 @@
 import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
 export class JwtService {
-  static sign(payload: object) {
+  sign(payload: { userId: string; email: string }) {
     return jwt.sign(payload, process.env.JWT_SECRET!, {
       expiresIn: '1d',
     });
   }
 
-  static verify(token: string) {
+  verify(token: string) {
     return jwt.verify(token, process.env.JWT_SECRET!);
   }
 }

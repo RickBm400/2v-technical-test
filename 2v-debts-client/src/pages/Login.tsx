@@ -1,10 +1,10 @@
 import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { loginUserQuery } from '@/network/queries/user.query';
+import { loginUserMutation } from '@/network/queries/user.query';
 import { useNavigate } from 'react-router';
 
 export default function Login() {
-  const { mutate: mutateLogin } = loginUserQuery();
+  const { mutate: mutateLogin } = loginUserMutation();
   const navigate = useNavigate();
 
   const onFinish = (payload: { email: string; password: string }) => {
@@ -55,15 +55,6 @@ export default function Login() {
               className='py-2'
             />
           </Form.Item>
-
-          {/* <Form.Item>
-            <Form.Item name='remember' valuePropName='checked' noStyle>
-              <Checkbox>Recordarme</Checkbox>
-            </Form.Item>
-            <a className='float-right' href='/forgot-password'>
-              ¿Olvidaste tu contraseña?
-            </a>
-          </Form.Item> */}
 
           <Form.Item>
             <Button

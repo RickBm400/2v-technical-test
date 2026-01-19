@@ -1,10 +1,35 @@
 import { Form, Input, Button, Card, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { registerUserMutation } from '@/network/queries/user.query';
+import { useNavigate } from 'react-router';
 
 export default function Register() {
-  const onFinish = (values: any) => {
-    console.log('Received values:', values);
-    message.success('Registro exitoso!');
+  const { mutate: mutateRegister } = registerUserMutation();
+  const navigate = useNavigate();
+
+  const onFinish = ({
+    email,
+    password,
+    name,
+  }: {
+    email: string;
+    name: string;
+    password: string;
+  }) => {
+    try {
+      mutateRegister(
+        { email, password, name },
+        {
+          onSuccess: () => {
+            message.success('Registro exitoso!');
+            navigate('/debts', { replace: true });
+          },
+        },
+      );
+    } catch (error) {
+      console.log(error);
+      message.error('Error al registrarse. Por favor, intenta de nuevo.');
+    }
   };
 
   return (
@@ -13,7 +38,18 @@ export default function Register() {
         <h1 className='text-2xl font-bold text-center mb-6'>Crear Cuenta</h1>
 
         <Form name='register_form' onFinish={onFinish} autoComplete='off'>
-          {/* Email */}
+          <Form.Item
+            name='name'
+            rules={[
+              { required: true, message: 'Por favor ingresa tu nombre!' },
+            ]}
+          >
+            <Input
+              prefix={<UserOutlined />}
+              placeholder='Nombre de usuario'
+              className='py-2'
+            />
+          </Form.Item>
           <Form.Item
             name='email'
             rules={[

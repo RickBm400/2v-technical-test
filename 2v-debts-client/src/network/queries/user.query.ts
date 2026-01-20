@@ -49,7 +49,7 @@ export const registerUserMutation = (onSuccess?: () => void) => {
 
 export const getUsersQuery = () => {
   return useQuery({
-    queryKey: ['users'],
+    queryKey: ['users-list'],
     queryFn: async () => {
       const response = await $axiosClient.get('/user');
       return response.data;

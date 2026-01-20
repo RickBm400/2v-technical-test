@@ -1,27 +1,45 @@
-import { addDebtMutation } from '@/network/queries/debts.query';
+import { useDebtListActionsContext } from '@/context/ListActions.context';
+import {
+  addDebtMutation,
+  updateDebtByIdMutation,
+} from '@/network/queries/debts.query';
 import { getUsersQuery } from '@/network/queries/user.query';
-import type { User } from '@/types/users.types';
+import type { debtsListDataType } from '@/types/debts.types';
 import { Modal, Form, DatePicker, Input, InputNumber, Select } from 'antd';
-import { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import { useEffect } from 'react';
 import { Navigate } from 'react-router';
 
 interface componentProps {
   open: boolean;
   onClose: () => void;
+  data?: debtsListDataType;
 }
 
 export default function NewDebtModal(props: componentProps) {
   const [form] = Form.useForm();
-  const [usersList, setUsersList] = useState<User[]>([]);
-  const { mutate: debtMutation } = addDebtMutation();
+  const { mutate: createDebtMutation } = addDebtMutation();
+  const { mutate: updateDebtMutation } = updateDebtByIdMutation();
   const { data: usersRetrievedData, isLoading, isError } = getUsersQuery();
+  const { modalEditorMode } = useDebtListActionsContext();
 
   useEffect(() => {
-    if (usersRetrievedData) {
-      const data = usersRetrievedData.data;
-      setUsersList(data);
+    if (!props.open) return;
+
+    if (modalEditorMode === 'EDIT' && props.data) {
+      form.setFieldsValue({
+        title: props.data.title,
+        description: props.data.description,
+        debtor_id: (props.data?.debtor as any)?.id,
+        total_debt: props.data.total_debt,
+        dueDate: dayjs(props.data.dueDate),
+      });
     }
-  }, [usersRetrievedData]);
+
+    if (modalEditorMode === 'CREATE') {
+      form.resetFields();
+    }
+  }, [props.data, props.open, , modalEditorMode, form]);
 
   if (isLoading) {
     return <p>Loading character </p>;
@@ -32,27 +50,34 @@ export default function NewDebtModal(props: componentProps) {
   }
 
   const submitDebt = async () => {
-    const debtDataPayload = await form.validateFields();
-    debtMutation(debtDataPayload);
-    console.log('Received values:', debtDataPayload);
+    const debtFormData = await form.validateFields();
+    const payload: debtsListDataType = {
+      ...debtFormData,
+      ...(debtFormData['dueDate'] && {
+        dueDate: debtFormData['dueDate'].toISOString(),
+      }),
+    };
+
+    console.log(props);
+    modalEditorMode == 'CREATE'
+      ? createDebtMutation(payload)
+      : updateDebtMutation({ id: props.data?.id as string, data: payload });
     props.onClose();
   };
 
   return (
     <Modal
-      title='Crear nueva deuda'
+      title={`${modalEditorMode == 'CREATE' ? 'Crear' : 'Editar'} nueva deuda`}
       centered
       open={props.open}
       onCancel={props.onClose}
       onOk={submitDebt}
-      destroyOnHidden={true}
-      okText='Crear deuda'
+      okText={`${modalEditorMode == 'CREATE' ? 'Crear' : 'Editar'}`}
       cancelText='Cancelar'
       modalRender={(dom) => (
         <Form
           form={form}
           name='new_debt_form'
-          initialValues={{ remember: true }}
           autoComplete='off'
           clearOnDestroy={true}
           preserve={false}
@@ -79,11 +104,11 @@ export default function NewDebtModal(props: componentProps) {
         <Input placeholder='Descripción'></Input>
       </Form.Item>
       <Form.Item
-        name='debtorId'
+        name='debtor_id'
         rules={[{ required: true, message: 'Debes elegir un deudor' }]}
       >
         <Select
-          options={usersList.map((user) => ({
+          options={usersRetrievedData.data?.map((user: any) => ({
             value: user.id,
             label: user.name,
           }))}
@@ -103,10 +128,11 @@ export default function NewDebtModal(props: componentProps) {
           placeholder='monto'
         ></InputNumber>
       </Form.Item>
-      <Form.Item name='due_date' rules={[{ required: false }]}>
+      <Form.Item name='dueDate' rules={[{ required: false }]}>
         <DatePicker
           style={{ width: '100%' }}
           placeholder='fecha de vencimiento'
+          format={'YYYY-MM-DD'}
         ></DatePicker>
       </Form.Item>
     </Modal>

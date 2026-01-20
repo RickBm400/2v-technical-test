@@ -19,8 +19,9 @@ export default function Debts() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [searchName, setSearchName] = useState<string | null>(null);
+  const [createDebtModal, setCreateDebtModal] = useState<boolean>(false);
   const [currentStatus, setCurrentStatus] = useState<debtStatus | 'ALL'>('ALL');
-  const { openTimeline, setOpenModal, openModal } = useDebtListActionsContext();
+  const { openTimeline, setModalEditorMode } = useDebtListActionsContext();
   const searchTimeoutRef = useRef<number | undefined>(undefined);
   const { data, isLoading, isError } = getDebtsPaginatedQuery({
     page: currentPage,
@@ -37,7 +38,7 @@ export default function Debts() {
     return <Navigate to={'/login'} />;
   }
 
-  const handlePaginationChange = (page: number, pageSize: number) => {
+  const handlePaginationChange = (page: number = 1, pageSize: number = 10) => {
     setCurrentPage(page);
     setPageSize(pageSize);
   };
@@ -90,7 +91,10 @@ export default function Debts() {
           <Button
             color='primary'
             variant='solid'
-            onClick={() => setOpenModal(true)}
+            onClick={() => {
+              setModalEditorMode('CREATE');
+              setCreateDebtModal(true);
+            }}
           >
             + Agregar deuda
           </Button>
@@ -107,7 +111,13 @@ export default function Debts() {
       <div className={` col-span-4 ${openTimeline ? 'block' : 'hidden'}`}>
         <DebtInfoCard />
       </div>
-      <NewDebtModal open={openModal} onClose={() => setOpenModal(false)} />
+      <NewDebtModal
+        open={createDebtModal}
+        onClose={() => {
+          setCreateDebtModal(false);
+          handlePaginationChange(1, 10);
+        }}
+      />
     </div>
   );
 }

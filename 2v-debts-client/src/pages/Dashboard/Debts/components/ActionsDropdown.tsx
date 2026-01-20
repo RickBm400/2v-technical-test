@@ -1,23 +1,33 @@
 import { useDebtListActionsContext } from '@/context/ListActions.context';
 import { deleteDebtMutation } from '@/network/queries/debts.query';
-import { Dropdown, type MenuProps } from 'antd';
+import { Dropdown, message, type MenuProps } from 'antd';
 import type React from 'react';
 
 export default function DropdownAction(props: {
   children: React.ReactNode;
   data: any;
+  methods: Record<string, React.Dispatch<React.SetStateAction<any>>>;
 }) {
-  const { setOpenTimeline, openTimeline, setDebtData } =
+  const { setOpenTimeline, openTimeline, setdebtListData, setModalEditorMode } =
     useDebtListActionsContext();
   const { mutate: deleteMutation } = deleteDebtMutation();
 
   const items: MenuProps['items'] = [
-    { label: 'Editar deuda', key: 'edit' },
+    {
+      label: 'Editar deuda',
+      key: 'edit',
+      onClick: () => {
+        setModalEditorMode('EDIT');
+        props.methods.setDebtDataToEdit(props.data);
+        props.methods.setEditorModal(true);
+      },
+    },
     {
       label: 'Eliminar deuda',
       key: 'delete',
       onClick: () => {
         deleteMutation(props.data.id);
+        message.success('Registro eliminado');
       },
     },
     { label: 'Pagar deuda', key: 'payment' },
@@ -25,7 +35,7 @@ export default function DropdownAction(props: {
       label: 'Movimientos',
       key: 'movements',
       onClick: () => {
-        setDebtData(props.data);
+        setdebtListData(props.data);
         if (!openTimeline) {
           setOpenTimeline(true);
         }

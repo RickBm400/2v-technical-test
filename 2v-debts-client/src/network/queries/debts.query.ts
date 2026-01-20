@@ -11,6 +11,7 @@ interface paginationParams {
 }
 
 export const getDebtsPaginatedQuery = (params?: paginationParams) => {
+  console.log(params);
   return useQuery({
     queryKey: ['debts-paginated', params],
     queryFn: async () => {
@@ -44,7 +45,33 @@ export const deleteDebtMutation = () => {
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['debts-paginated', 1, 10] });
+      queryClient.invalidateQueries({
+        queryKey: ['debts-paginated', { page: 1, limit: 10, search: null }],
+      });
+    },
+    onError: (error) => {
+      console.log(error);
+    },
+  });
+};
+
+export const updateDebtByIdMutation = () => {
+  return useMutation({
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: Partial<debtsListDataType>;
+    }) => {
+      console.log(data);
+      const response = await $axiosClient.patch(`/debt/${id}`, data);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['debts-paginated', { page: 1, limit: 10, search: null }],
+      });
     },
     onError: (error) => {
       console.log(error);

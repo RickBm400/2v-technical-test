@@ -8,6 +8,8 @@ import StatusTag from './StatusTag';
 // local types
 import type { debtsListDataType } from '@/types/debts.types';
 import DropdownAction from './ActionsDropdown';
+import NewDebtModal from './NewDebtModal';
+import { useState } from 'react';
 
 interface componentProps {
   debtsData: { limit: number; total: number; data: debtsListDataType[] };
@@ -17,6 +19,9 @@ interface componentProps {
 }
 
 export default function ListDebts(props: componentProps) {
+  const [editorModal, setEditorModal] = useState(false);
+  const [debtDataToEdit, setDebtDataToEdit] = useState<debtsListDataType>();
+
   const columns: TableProps<debtsListDataType>['columns'] = [
     {
       key: 'title',
@@ -47,7 +52,10 @@ export default function ListDebts(props: componentProps) {
       title: 'Acciones',
       className: 'flex justify-end',
       render: (item) => (
-        <DropdownAction data={item}>
+        <DropdownAction
+          data={item}
+          methods={{ setEditorModal, setDebtDataToEdit }}
+        >
           <Button color='green' shape='circle'>
             <Icon path={mdiDotsVertical} size={0.9} />
           </Button>
@@ -63,18 +71,28 @@ export default function ListDebts(props: componentProps) {
     })) || [];
 
   return (
-    <Table<debtsListDataType>
-      dataSource={tableData}
-      columns={columns}
-      pagination={{
-        current: props.currentPage,
-        pageSize: props.debtsData?.limit,
-        total: props.debtsData?.total as any,
-        onChange: props.handlePaginationChange,
-        showSizeChanger: true,
-        pageSizeOptions: ['5', '10', '20', '50'],
-        showTotal: (total) => `Total ${total} deudas`,
-      }}
-    ></Table>
+    <div>
+      <Table<debtsListDataType>
+        dataSource={tableData}
+        columns={columns}
+        pagination={{
+          current: props.currentPage,
+          pageSize: props.debtsData?.limit,
+          total: props.debtsData?.total as any,
+          onChange: props.handlePaginationChange,
+          showSizeChanger: true,
+          pageSizeOptions: ['5', '10', '20', '50'],
+          showTotal: (total) => `Total ${total} deudas`,
+        }}
+      ></Table>
+      <NewDebtModal
+        open={editorModal}
+        onClose={() => {
+          setEditorModal(false);
+          props.handlePaginationChange(1, 10);
+        }}
+        data={debtDataToEdit}
+      />
+    </div>
   );
 }

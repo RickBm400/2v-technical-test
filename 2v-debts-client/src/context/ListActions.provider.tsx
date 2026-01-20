@@ -4,16 +4,20 @@ import type { debtsListDataType } from '@/types/debts.types';
 
 const ListActionsProvider = ({ children }: { children: React.ReactNode }) => {
   const [openTimeline, setOpenTimeline] = useState<boolean>(false);
-  const [openModal, setOpenModal] = useState<boolean>(false);
-  const [debtData, setDebtData] = useState<debtsListDataType | null>(null);
+  const [debtListData, setdebtListData] = useState<debtsListDataType | null>(
+    null,
+  );
+  const [modalEditorMode, setModalEditorMode] = useState<'CREATE' | 'EDIT'>(
+    'CREATE',
+  );
 
   const value = {
     openTimeline,
     setOpenTimeline,
-    openModal,
-    setOpenModal,
-    debtData,
-    setDebtData,
+    debtListData,
+    setdebtListData,
+    modalEditorMode,
+    setModalEditorMode,
   };
 
   return (

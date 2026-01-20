@@ -1,3 +1,5 @@
+import type { User } from './users.types';
+
 export enum debtStatus {
   PENDING = 'PENDING',
   COMPLETED = 'COMPLETED',
@@ -11,7 +13,9 @@ export interface debtsListDataType {
   total_paid?: number;
   title: string;
   description: string;
-  debtorId?: string;
-  creditorId?: string;
+  // debtorId?: string;
+  debtor?: string | User | null;
+  creditor?: string;
+  // creditor_id?: string;
   dueDate?: string | Date | undefined;
 }

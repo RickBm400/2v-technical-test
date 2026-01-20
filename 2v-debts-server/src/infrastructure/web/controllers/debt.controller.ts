@@ -64,7 +64,7 @@ router.post(
     const createDebt = new CreateDebtUseCase();
 
     const newDebt = await createDebt.execute({
-      creditorId: userId,
+      creditor_id: userId,
       ...debt,
     });
 
@@ -78,12 +78,16 @@ router.post(
 // update debt info
 router.patch(
   '/:id',
+  authMiddleware,
   asyncHandler(async (req, res) => {
+    const userId = req.user?.userId || null;
+    if (!userId) throw new CustomError('Forbidden access', 403);
+
     const debt = req.body;
     const debtId = req.params.id as string;
 
     const updateDebt = new UpdateDebtUseCase();
-    await updateDebt.execute(debtId, debt);
+    await updateDebt.execute(debtId, { ...debt, creditor_id: userId });
 
     res.status(200).json({
       message: 'Debt Updated successfully',

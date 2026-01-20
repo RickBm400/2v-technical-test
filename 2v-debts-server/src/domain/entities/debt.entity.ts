@@ -11,7 +11,7 @@ export interface Debt {
   total_paid: number;
   title: string;
   description: string;
-  debtor_id: string;
-  creditor_id: string;
+  debtor: string;
+  creditor: string;
   due_date: string | Date | undefined;
 }

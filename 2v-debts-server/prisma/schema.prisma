@@ -27,8 +27,8 @@ model User {
   friendships Friendship[] @relation("UserFriendships")
   friends     Friendship[] @relation("UserFriends")
   movements   Movement[]
-  creditor    Debt[]       @relation("UserCreditor")
-  debtor      Debt[]       @relation("UserDebtor")
+  creditor    Debt[]       @relation("Creditor")
+  debtor      Debt[]       @relation("Debtor")
 
   @@map("users")
 }
@@ -51,10 +51,11 @@ model Debt {
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
-  creditorId  String
-  creditor_id User       @relation("UserCreditor", fields: [creditorId], references: [id])
-  debtorId    String
-  debtor_id   User       @relation("UserDebtor", fields: [debtorId], references: [id])
+  creditor_id  String
+  debtor_id    String
+
+  creditor User       @relation("Creditor", fields: [creditor_id], references: [id])
+  debtor   User       @relation("Debtor", fields: [debtor_id], references: [id])
   movements   Movement[]
 
   users User[]
@@ -68,9 +69,10 @@ model Friendship {
   updatedAt DateTime @updatedAt
 
   userId    String
-  user_id   User   @relation("UserFriendships", fields: [userId], references: [id])
   friendId  String
-  friend_id User   @relation("UserFriends", fields: [friendId], references: [id])
+
+  user   User   @relation("UserFriendships", fields: [userId], references: [id])
+  friend User   @relation("UserFriends", fields: [friendId], references: [id])
 
   @@unique([userId, friendId])
   @@map("friendships")
@@ -93,8 +95,9 @@ model Movement {
   deletedAt       DateTime?
 
   user_id String
-  user    User   @relation(fields: [user_id], references: [id])
   debt_id String
+
+  user    User   @relation(fields: [user_id], references: [id])
   debt    Debt   @relation(fields: [debt_id], references: [id])
 
   @@map("movements")

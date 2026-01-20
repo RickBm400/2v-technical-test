@@ -13,8 +13,8 @@ export class CreateDebtUseCase implements UseCase {
     private debtRepository: PrismaDebtRepository = new PrismaDebtRepository(),
   ) {}
 
-  async execute(debtData: Partial<Debt>) {
-    const debt = await this.debtRepository.create(debtData as any);
+  async execute(debtListData: Partial<Debt>) {
+    const debt = await this.debtRepository.create(debtListData as any);
     if (!debt) throw new CustomError("Couldn\'t create debt", 200);
     return debt;
   }
@@ -25,12 +25,12 @@ export class UpdateDebtUseCase implements UseCase {
     private debtRepository: PrismaDebtRepository = new PrismaDebtRepository(),
   ) {}
 
-  async execute(id: string | null, debtData: any) {
+  async execute(id: string | null, debtListData: Debt) {
     if (!id) throw new CustomError('id is required', 400);
 
-    const debt = await this.debtRepository.update(id, debtData);
+    const debt = await this.debtRepository.update(id, debtListData);
 
-    await deleteCacheByPattern(`debts|${debt.creditorId}|*`);
+    await deleteCacheByPattern(`debts|${debt.creditor_id}|*`);
 
     return debt;
   }
@@ -50,7 +50,7 @@ export class DeleteDebtUseCase implements UseCase {
 
     await this.debtRepository.delete(id);
 
-    await deleteCacheByPattern(`debts|${debt.creditorId}|*`);
+    await deleteCacheByPattern(`debts|${debt.creditor_id}|*`);
 
     return id;
   }

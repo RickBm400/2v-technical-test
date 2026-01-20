@@ -15,7 +15,7 @@ export class PrismaDebtRepository {
     const where: Prisma.DebtWhereInput = {
       AND: [
         {
-          OR: [{ debtorId: user_id }, { creditorId: user_id }],
+          OR: [{ debtor_id: user_id }, { creditor_id: user_id }],
         },
         { status: { not: DebtStatus.DELETED } },
         ...(options?.status ? [{ status: options.status }] : []),
@@ -37,6 +37,9 @@ export class PrismaDebtRepository {
         where,
         skip,
         take: limit,
+        include: {
+          debtor: true,
+        },
         orderBy: { createdAt: 'desc' },
       }),
 
@@ -56,12 +59,17 @@ export class PrismaDebtRepository {
     return prisma.debt.findFirst({ where: { id, ...options } });
   }
 
-  create(data: Prisma.DebtCreateInput) {
-    return prisma.debt.create({ data });
+  create(data: any) {
+    return prisma.debt.create({
+      data,
+    });
   }
 
   update(id: string, data: any) {
-    return prisma.debt.update({ where: { id }, data });
+    return prisma.debt.update({
+      where: { id },
+      data,
+    });
   }
 
   delete(id: string) {
